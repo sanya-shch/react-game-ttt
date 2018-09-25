@@ -1,15 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 
-// var arr =[1,2,3,4,5];var rez =arr.filter(function(el){return el % 2;});console.log({rez});
-// var a={name:'a'};var b={name:'a'};console.log(a===b);
-//
-// function f1(a,b) {
-//     console.log(a,b);
-// }
-// var f2=f1.bind(null,'foo');
-// f2('bar','baz');
-
 class App extends Component {
 
     constructor(){
@@ -24,28 +15,38 @@ class App extends Component {
 
     }
 
-    clicked(event){
-        if(this.state.board[event.target.dataset.square] == '') {
-            this.state.board[event.target.dataset.square] = this.state.turn;
-            event.target.innerText = this.state.turn;
+    clicked(box){
+        if(this.state.gameEnded)return;
+
+        if(this.state.board[box.dataset.square] == '') {
+            this.state.board[box.dataset.square] = this.state.turn;
+            box.innerText = this.state.turn;
             this.setState({
                 turn: this.state.turn == 'X' ? 'O' : 'X',
                 board: this.state.board,
-                totalMoves: this.state.totalMoves++
-            })
+                totalMoves: ++this.state.totalMoves
+            });
         }
 
         var rezult = this.checkWinner();
         if(rezult == 'X'){
+          //  this.state.gameEnded = true;
             this.setState({
                 gameEnded: true,
                 winner: 'X'
-            });
+            })
         } else if(rezult == 'O'){
+          ////  this.state.gameEnded = true;
             this.setState({
                 gameEnded: true,
                 winner: 'O'
-            });
+            })
+        } else if(rezult == 'draw'){
+          //  this.state.gameEnded = true;
+            this.setState({
+                gameEnded: true,
+                winner: 'draw'
+            })
         }
 
     }
@@ -53,10 +54,15 @@ class App extends Component {
     checkWinner(){
         var moves = [[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6],[0,1,2],[3,4,5],[6,7,8]];
         var board = this.state.board;
+
         for(let i=0;i<moves.length;i++){
             if(board[moves[i][0]] == board[moves[i][1]] && board[moves[i][1]] == board[moves[i][2]]){
                 return board[moves[i][0]];
             }
+        }
+
+        if (this.state.totalMoves == 9){
+            return 'draw';
         }
     }
 
@@ -66,7 +72,7 @@ class App extends Component {
                 <div id="head">
                     Tic Tac Toe
                 </div>
-                <div id="board" onClick={(e)=>this.clicked(e)}>
+                <div id="board" onClick={(e)=>this.clicked(e.target)}>
                     <div className="square" data-square="0"></div>
                     <div className="square" data-square="1"></div>
                     <div className="square" data-square="2"></div>
@@ -77,6 +83,7 @@ class App extends Component {
                     <div className="square" data-square="7"></div>
                     <div className="square" data-square="8"></div>
                 </div>
+                <div id="status">{this.state.winner}</div>
             </div>
         );
     }
